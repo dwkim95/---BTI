@@ -37,9 +37,9 @@
 
         <!-- 시작 화면 -->
         <div id="start-screen" class="fade-in">
-            <div class="image-container w-32 h-32 mx-auto rounded-full shadow-lg mb-6 overflow-hidden">
-                <img src="images/sunflower-giraffe.png" alt="해바라기린 아이콘" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"128\" height=\"128\" viewBox=\"0 0 128 128\"%3E%3Crect width=\"128\" height=\"128\" fill=\"%23fbbf24\"%2F%3E%3Ctext x=\"64\" y=\"64\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-size=\"60\"%3E🌻%3C%2Ftext%3E%3C%2Fsvg%3E'">
-            </div>
+           <div class="w-32 h-32 mx-auto rounded-full shadow-lg mb-6 overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center">
+    <img src="images/sunflower-giraffe.png" alt="해바라기린 아이콘" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\"font-size: 80px;\">🌻</span>'">
+</div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">관종력 테스트</h1>
             <p class="text-gray-600 mb-8">나는 혹시 관종일까?<br>나의 병맛미 넘치는 꽃-BTI를 확인해보세요!</p>
             <button onclick="startQuiz()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
