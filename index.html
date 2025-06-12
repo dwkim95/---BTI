@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관종력 테스트 (병맛 꽃-BTI)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 이미지 로딩 중 표시를 위한 스타일 */
+        .image-container {
+            background-color: #f3f4f6;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-lg mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8 text-center transition-all duration-500">
+
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="fade-in">
+            <div class="image-container w-32 h-32 mx-auto rounded-full shadow-lg mb-6 overflow-hidden">
+                <img src="images/sunflower-giraffe.png" alt="해바라기린 아이콘" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"128\" height=\"128\" viewBox=\"0 0 128 128\"%3E%3Crect width=\"128\" height=\"128\" fill=\"%23fbbf24\"%2F%3E%3Ctext x=\"64\" y=\"64\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-size=\"60\"%3E🌻%3C%2Ftext%3E%3C%2Fsvg%3E'">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">관종력 테스트</h1>
+            <p class="text-gray-600 mb-8">나는 혹시 관종일까?<br>나의 병맛미 넘치는 꽃-BTI를 확인해보세요!</p>
+            <button onclick="startQuiz()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                테스트 시작
+            </button>
+        </div>
+
+        <!-- 퀴즈 화면 -->
+        <div id="quiz-screen" class="hidden">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-orange-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <h2 id="question" class="text-2xl font-bold text-gray-800 mb-8 h-20 flex items-center justify-center"></h2>
+            <div id="answers" class="space-y-4">
+                <!-- 답변 버튼이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+
+        <!-- 수익화 링크 화면 -->
+        <div id="monetization-screen" class="hidden fade-in">
+            <div class="w-32 h-32 mx-auto rounded-full shadow-lg mb-6 bg-green-100 flex items-center justify-center">
+                <span style="font-size: 60px;">🎁</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">결과 분석 중...</h2>
+            <p class="text-gray-600 mb-8">테스트 제작자에게 커피 한 잔의 힘을 주세요! ☕<br>잠깐 파트너스 스토어를 구경하고<br>바로 결과를 확인해 보세요.</p>
+            <button onclick="showResult()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                스토어 구경하고 결과 보기
+            </button>
+            <p class="text-xs text-gray-400 mt-4">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+        </div>
+        
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="hidden">
+            <p class="text-orange-500 font-bold mb-2">당신의 꽃-BTI는...</p>
+            <h1 id="result-title" class="text-3xl font-bold text-gray-800 mb-4"></h1>
+            <div class="image-container w-full max-w-sm mx-auto rounded-lg shadow-lg mb-6 overflow-hidden">
+                <img id="result-image" src="" alt="결과 이미지">
+            </div>
+            <div id="result-description-container" class="text-gray-700 mb-8 text-left p-4 bg-amber-50 rounded-lg">
+                <!-- 결과 설명이 여기에 동적으로 생성됩니다 -->
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button id="copy-link-btn" onclick="copyLink()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                    </svg>
+                    <span>링크 복사</span>
+                </button>
+                <button onclick="restartQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    다시하기
+                </button>
+            </div>
+            <button onclick="showSummary()" class="mt-4 w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                전체 결과 보기
+            </button>
+        </div>
+        
+        <!-- 최종 정리 이미지 화면 -->
+        <div id="summary-screen" class="hidden fade-in">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">우리의 병맛 꽃-BTI 친구들</h1>
+            <div id="summary-grid" class="grid grid-cols-2 gap-4 mb-6">
+            </div>
+            <button onclick="restartQuiz()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                테스트 다시하기
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // 퀴즈 데이터
+        const quizData = [
+            {
+                question: "친구가 '나 살찐 거 같아?'라고 물어본다면?",
+                answers: [
+                    { text: "에이, 너보다 뚱뚱한 사람 널렸어! 밥이나 먹으러 가자!", type: "A" },
+                    { text: "(못 들은 척 이어폰을 낀다)", type: "B" },
+                    { text: "어. (팩트 폭격)", type: "C" },
+                    { text: "글쎄... 갑자기 왜? 무슨 일 있어?", type: "D" }
+                ]
+            },
+            {
+                question: "길에서 10만 원을 주웠다! 당신의 선택은?",
+                answers: [
+                    { text: "오늘 내가 쏜다! 얘들아 모여!", type: "A" },
+                    { text: "일단 내 주머니에... 나중에 주인 나타나면 돌려주지 뭐.", type: "B" },
+                    { text: "가만히 서서 주인이 오길 기다리거나 경찰서에 가져다준다.", type: "C" },
+                    { text: "CCTV 없는 곳인지 먼저 확인한다.", type: "D" }
+                ]
+            },
+            {
+                question: "팀 프로젝트에서 가장 싫은 유형은?",
+                answers: [
+                    { text: "아무 말 없이 조용한 사람. 답답해!", type: "A" },
+                    { text: "자꾸 나한테 뭐 시키는 사람.", type: "B" },
+                    { text: "근거 없이 '느낌'으로만 주장하는 사람.", type: "C" },
+                    { text: "어설프게 아는 척하며 나서는 사람.", type: "D" }
+                ]
+            },
+            {
+                question: "갑자기 하루의 자유시간이 생겼다. 무엇을 할까?",
+                answers: [
+                    { text: "당장 친구들에게 전화해서 약속을 잡는다.", type: "A" },
+                    { text: "집에서 뒹굴뒹굴... 침대 밖은 위험해.", type: "B" },
+                    { text: "평소에 읽고 싶었던 책을 읽거나 혼자만의 시간을 갖는다.", type: "C" },
+                    { text: "평소에 벼르던 맛집 탐방이나 쇼핑을 하러 간다.", type: "D" }
+                ]
+            }
+        ];
+
+        // 결과 데이터
+        const results = {
+            A: {
+                title: "관심 MAX! 해바라기린",
+                image: "images/sunflower-giraffe.png",
+                emoji: "🌻🦒",
+                description: [
+                    "목이 긴 기린처럼 언제나 관심의 중심에 서고 싶은 당신! 자타공인 핵인싸 타입입니다.",
+                    "사람들의 주목을 즐기며, 칭찬 한마디에 하루 종일 춤을 춥니다.",
+                    "긍정 에너지와 추진력이 넘쳐 주변 사람들을 이끄는 리더 역할을 자주 맡습니다.",
+                    "하지만 가끔 너무 나서는 바람에 눈총을 사기도 합니다. (알지만 멈출 수 없음)",
+                    "외로움은 1초도 참을 수 없는 당신, 오늘도 친구들을 찾아 떠납니다.",
+                    "관종력: 99%"
+                ]
+            },
+            B: {
+                title: "만사태평! 민들레오파드",
+                image: "images/dandelion-leopard.png",
+                emoji: "🌼🐆",
+                description: [
+                    "바람 따라 흩날리는 민들레 홀씨처럼, 세상만사 자유롭고 태평한 당신! 하지만 내면엔 맹수(레오파드)가 숨어있습니다.",
+                    "귀찮은 일은 어떻게든 피하고 보는 미루기 끝판왕입니다.",
+                    "최소한의 에너지로 최대한의 효율을 추구하는 '갓성비' 라이프를 지향합니다.",
+                    "하지만 누군가 나의 영역을 침범하거나 선을 넘는다면, 숨겨왔던 발톱을 드러냅니다.",
+                    "혼자만의 시간을 무엇보다 소중하게 생각합니다. (제발 말 걸지 마...)",
+                    "관종력: 15%"
+                ]
+            },
+            C: {
+                title: "팩트 폭격! 선인장아치",
+                image: "images/cactus-hedgehog.png",
+                emoji: "🌵🦔",
+                description: [
+                    "고슴도치처럼 뾰족한 가시를 세운 선인장 같은 당신! 다가가기 어렵지만, 속은 누구보다 촉촉한 츤데레입니다.",
+                    "T발? C야? 라는 말을 자주 듣는, 공감 능력보다는 이성적인 판단이 앞서는 타입입니다.",
+                    "무뚝뚝하고 직설적이라 오해를 사지만, 사실은 상처받는 게 두려울 뿐입니다.",
+                    "한번 마음을 연 상대에게는 모든 걸 내어주는 의리파입니다.",
+                    "나만의 공간과 시간을 존중해 주는 사람에게 큰 매력을 느낍니다.",
+                    "관종력: 30% (관심은 싫지만, 은근히 알아주길 바람)"
+                ]
+            },
+            D: {
+                title: "은밀한 사냥꾼! 파리지옥아리",
+                image: "images/venus-flytrap.png",
+                emoji: "🪴🦊",
+                description: [
+                    "여우처럼 매력적이지만, 파리지옥처럼 날카로운 함정을 숨기고 있는 당신! 영리하고 신비로운 밀당의 고수입니다.",
+                    "사람들의 심리를 꿰뚫어 보고 상황을 자신에게 유리하게 만드는 능력이 탁월합니다.",
+                    "겉으로는 다 맞춰주는 척하지만, 결국 모든 것은 당신의 큰 그림 안에 있습니다.",
+                    "재미없는 것은 죽어도 못 참는, 쾌락과 새로운 자극을 추구하는 타입입니다.",
+                    "친절한 미소 뒤에 숨겨진 당신의 진짜 생각을 아는 사람은 아무도 없습니다.",
+                    "관종력: 75% (직접적인 관심보다, 은밀한 관심과 질투를 즐김)"
+                ]
+            }
+        };
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const monetizationScreen = document.getElementById('monetization-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const summaryScreen = document.getElementById('summary-screen');
+        const progressBar = document.getElementById('progress-bar');
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('fade-in');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const currentQuiz = quizData[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            questionEl.textContent = currentQuiz.question;
+            answersEl.innerHTML = '';
+            currentQuiz.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.textContent = answer.text;
+                button.className = "w-full bg-amber-100 hover:bg-amber-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition-all duration-200";
+                button.onclick = () => selectAnswer(answer.type);
+                answersEl.appendChild(button);
+            });
+        }
+
+        function selectAnswer(type) {
+            userAnswers.push(type);
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                const progress = ((currentQuestionIndex) / quizData.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                quizScreen.classList.remove('fade-in');
+                void quizScreen.offsetWidth;
+                quizScreen.classList.add('fade-in');
+                showQuestion();
+            } else {
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    quizScreen.classList.add('hidden');
+                    monetizationScreen.classList.remove('hidden');
+                }, 500);
+            }
+        }
+        
+        function getResultType() {
+            const counts = {};
+            userAnswers.forEach(answer => {
+                counts[answer] = (counts[answer] || 0) + 1;
+            });
+            return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+        }
+
+        function showResult() {
+            // 쿠팡 파트너스 링크 (실제 링크로 교체 필요)
+            const coupartnersLink = "https://link.coupang.com/a/bxxxx";
+            window.open(coupartnersLink, '_blank');
+            
+            const resultType = getResultType();
+            const result = results[resultType];
+            
+            document.getElementById('result-title').textContent = result.title;
+            const resultImage = document.getElementById('result-image');
+            resultImage.src = result.image;
+            resultImage.alt = result.title;
+            
+            // 이미지 로드 실패 시 이모지 대체
+            resultImage.onerror = function() {
+                const container = this.parentElement;
+                container.innerHTML = `<div style="font-size: 100px;">${result.emoji}</div>`;
+            };
+            
+            const descriptionContainer = document.getElementById('result-description-container');
+            descriptionContainer.innerHTML = '';
+            
+            const intro = document.createElement('p');
+            intro.textContent = result.description[0];
+            intro.className = "font-semibold mb-4";
+            descriptionContainer.appendChild(intro);
+            
+            const list = document.createElement('ul');
+            list.className = "space-y-2";
+            for (let i = 1; i < result.description.length; i++) {
+                const item = document.createElement('li');
+                item.className = "flex items-start";
+                const bullet = document.createElement('span');
+                bullet.textContent = '🌿';
+                bullet.className = "mr-2 text-green-500";
+                item.appendChild(bullet);
+                const text = document.createElement('span');
+                text.textContent = result.description[i];
+                item.appendChild(text);
+                list.appendChild(item);
+            }
+            descriptionContainer.appendChild(list);
+            
+            monetizationScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+        }
+
+        function showSummary() {
+            resultScreen.classList.add('hidden');
+            summaryScreen.classList.remove('hidden');
+
+            const summaryGrid = document.getElementById('summary-grid');
+            summaryGrid.innerHTML = '';
+
+            for (const key in results) {
+                const result = results[key];
+                const card = document.createElement('div');
+                card.className = 'flex flex-col items-center p-2 rounded-lg bg-amber-100 shadow-sm';
+                
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-container w-full h-32 rounded-md overflow-hidden';
+                
+                const img = document.createElement('img');
+                img.src = result.image;
+                img.alt = result.title;
+                img.onerror = function() {
+                    this.parentElement.innerHTML = `<div style="font-size: 60px;">${result.emoji}</div>`;
+                };
+                
+                imgContainer.appendChild(img);
+                
+                const title = document.createElement('p');
+                title.textContent = result.title;
+                title.className = 'mt-2 font-semibold text-sm text-gray-700';
+                
+                card.appendChild(imgContainer);
+                card.appendChild(title);
+                summaryGrid.appendChild(card);
+            }
+        }
+
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            summaryScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('fade-in');
+        }
+
+        function copyLink() {
+            const textArea = document.createElement("textarea");
+            textArea.value = window.location.href;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.getElementById('copy-link-btn');
+                const originalContent = copyBtn.innerHTML;
+                copyBtn.innerHTML = `✅ 복사 완료!`;
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalContent;
+                }, 2000);
+            } catch (err) {
+                console.error('링크 복사에 실패했습니다.', err);
+                alert('오류가 발생하여 링크를 복사할 수 없습니다.');
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
